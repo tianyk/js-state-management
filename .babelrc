@@ -1,0 +1,23 @@
+{
+    "plugins": [
+        [
+            "@babel/plugin-proposal-decorators",
+            {
+                "decoratorsBeforeExport": true
+            }
+        ]
+    ],
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                "targets": [
+                    "chrome >= 80"
+                ],
+                "useBuiltIns": "usage",
+                "corejs": 3
+            }
+        ],
+        "@babel/preset-react"
+    ]
+}
