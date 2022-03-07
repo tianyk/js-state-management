@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Provider, connect, ConnectedProps } from 'react-redux';
-import { createStore, combineReducers } from 'redux';
+import thunk from 'redux-thunk';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
 import Debug from 'debug';
+
+import type { Dispatch, Action } from 'redux';
 
 const debug = Debug('redux');
 
@@ -19,6 +22,12 @@ interface User {
 interface RootState {
     todos: Todo[],
     user?: User
+}
+
+async function getCurrentUser(): Promise<User> {
+    return {
+        username: `u-${Date.now()}`
+    }
 }
 
 interface TodoViewProps {
@@ -88,9 +97,32 @@ const userConnector = connect(
             user: state.user
         }
     },
+    (dispatch) => {
+        debug('TodoListView.mapDispatchToProps: %j', dispatch);
+        return {
+            getCurrentUser: () => {
+                console.log('getCurrentUser');
+                return async (dispatch: Dispatch<Action<any>>, getState: any) => {
+                    console.log(dispatch, getState, '----------------');
+                    const user = await getCurrentUser();
+                    console.log('user, begore', user)
+                    dispatch({
+                        type: 'USER_ME',
+                        user
+                    });
+                    console.log('userme-----------')
+                }
+            }
+        }
+    }
 )
 
-function UserView({ user }: ConnectedProps<typeof userConnector>) {
+function UserView({ user, getCurrentUser }: ConnectedProps<typeof userConnector>) {
+    useEffect(() => {
+        console.log('me')
+        getCurrentUser();
+    }, []);
+
     return <div>username: {user?.username}</div>
 }
 
@@ -126,16 +158,18 @@ const store = createStore(combineReducers<RootState>({
             return state;
         }
     },
-    user: (state = { username: '小明' }, action) => {
+    user: (state = { username: '' }, action) => {
         // 所有的 reducer 都会执行
         debug('reducer[user]: %j %j', state, action);
         if (action.type === 'ADD_TODO') {
             return { ...state };
+        } else if (action.type === 'USER_ME') {
+            return action.user;
         } else {
-            return state;
+            return Object.assign({}, { username: '小明' }, state);
         }
     }
-}));
+}), applyMiddleware(thunk));
 
 store.subscribe(() => {
     debug('subscribe %j', store.getState());
