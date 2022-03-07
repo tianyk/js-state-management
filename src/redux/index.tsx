@@ -119,7 +119,6 @@ const userConnector = connect(
 
 function UserView({ user, getCurrentUser }: ConnectedProps<typeof userConnector>) {
     useEffect(() => {
-        console.log('me')
         getCurrentUser();
     }, []);
 
