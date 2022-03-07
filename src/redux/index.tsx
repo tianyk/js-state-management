@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import { Provider, connect, ConnectedProps } from 'react-redux';
-import thunk from 'redux-thunk';
-import { createStore, combineReducers, applyMiddleware } from 'redux';
 import Debug from 'debug';
-
-import type { Dispatch, Action } from 'redux';
+import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
+import { connect, ConnectedProps, Provider } from 'react-redux';
+import type { AnyAction } from 'redux';
+import { applyMiddleware, combineReducers, createStore } from 'redux';
+import type { ThunkDispatch } from 'redux-thunk';
+import thunk from 'redux-thunk';
 
 const debug = Debug('redux');
+
 
 interface Todo {
     id: number,
@@ -97,25 +98,20 @@ const userConnector = connect(
             user: state.user
         }
     },
-    (dispatch) => {
-        debug('TodoListView.mapDispatchToProps: %j', dispatch);
+    (dispatch: ThunkDispatch<RootState, {}, AnyAction>) => {
+        debug('UserView.mapDispatchToProps: %j', dispatch);
         return {
             getCurrentUser: () => {
-                console.log('getCurrentUser');
-                return async (dispatch: Dispatch<Action<any>>, getState: any) => {
-                    console.log(dispatch, getState, '----------------');
+                // 异步 action，dispatch内部为一个函数
+                dispatch(async (dispatch, getState) => {
                     const user = await getCurrentUser();
-                    console.log('user, begore', user)
-                    dispatch({
-                        type: 'USER_ME',
-                        user
-                    });
-                    console.log('userme-----------')
-                }
-            }
+                    dispatch({ type: 'USER_ME', user });
+                });
+            },
+            dispatch
         }
     }
-)
+);
 
 function UserView({ user, getCurrentUser }: ConnectedProps<typeof userConnector>) {
     useEffect(() => {
@@ -165,7 +161,7 @@ const store = createStore(combineReducers<RootState>({
         } else if (action.type === 'USER_ME') {
             return action.user;
         } else {
-            return Object.assign({}, { username: '小明' }, state);
+            return Object.assign({}, state);
         }
     }
 }), applyMiddleware(thunk));
@@ -182,5 +178,3 @@ function App() {
 }
 
 ReactDOM.render(<App />, document.getElementById('redux-todo'));
-
-
