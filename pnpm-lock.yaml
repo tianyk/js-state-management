@@ -15,6 +15,7 @@ specifiers:
   css-loader: ^6.5.1
   debug: ^4.3.3
   html-webpack-plugin: ^5.5.0
+  immer: ^9.0.12
   less: ^4.1.2
   less-loader: ^10.2.0
   lodash: ^4.17.21
@@ -36,6 +37,7 @@ specifiers:
 
 dependencies:
   debug: mirrors.tencent.com/debug/4.3.3
+  immer: 9.0.12
   lodash: mirrors.tencent.com/lodash/4.17.21
   mobx: 6.4.2
   mobx-react: 7.3.0_ef3e35b77ad88417cae4ace8e8f361f3
@@ -2281,6 +2283,15 @@ packages:
     hasBin: true
     dev: true
 
+  /errno/0.1.8:
+    resolution: {integrity: sha512-dJ6oBr5SQ1VSd9qkk7ByRgb/1SH4JZjCHSW/mr63/QcXO9zLVxvJ6Oy13nio03rxpSnVDDjFor75SjVeZWPW/A==}
+    hasBin: true
+    requiresBuild: true
+    dependencies:
+      prr: 1.0.1
+    dev: true
+    optional: true
+
   /escalade/3.1.1:
     resolution: {integrity: sha512-k0er2gUkLf8O0zKJiAhmkTnJlTvINGv7ygDNPbeIsX/TJjGJZHuh9B2UxbsaEkmlEo9MfhrSzmhIlhRlI2GXnw==}
     engines: {node: '>=6'}
@@ -2532,13 +2543,9 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
-  /image-size/0.5.5:
-    resolution: {integrity: sha1-Cd/Uq50g4p6xw+gLiZA3jfnjy5w=}
-    engines: {node: '>=0.10.0'}
-    hasBin: true
-    requiresBuild: true
-    dev: true
-    optional: true
+  /immer/9.0.12:
+    resolution: {integrity: sha512-lk7UNmSbAukB5B6dh9fnh5D0bJTOFKxVg2cyJWTYrWRfhLrLMBquONcUs3aFq507hNoIZEDDh8lb8UtOizSMhA==}
+    dev: false
 
   /import-local/3.0.3:
     resolution: {integrity: sha512-bE9iaUY3CXH8Cwfan/abDKAxe1KGT9kyGsBPqf6DMK/z0a2OzAsrukeYNgIH6cH5Xr452jb1TUL8rSfCLjZ9uA==}
@@ -2731,9 +2738,9 @@ packages:
       parse-node-version: 1.0.1
       tslib: 2.3.1
     optionalDependencies:
-      errno: mirrors.tencent.com/errno/0.1.8
+      errno: 0.1.8
       graceful-fs: mirrors.tencent.com/graceful-fs/4.2.8
-      image-size: 0.5.5
+      image-size: mirrors.tencent.com/image-size/0.5.5
       make-dir: mirrors.tencent.com/make-dir/2.1.0
       mime: mirrors.tencent.com/mime/1.6.0
       needle: mirrors.tencent.com/needle/2.9.1
@@ -4180,17 +4187,6 @@ packages:
     engines: {node: '>=0.12'}
     dev: true
 
-  mirrors.tencent.com/errno/0.1.8:
-    resolution: {integrity: sha512-dJ6oBr5SQ1VSd9qkk7ByRgb/1SH4JZjCHSW/mr63/QcXO9zLVxvJ6Oy13nio03rxpSnVDDjFor75SjVeZWPW/A==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://mirrors.tencent.com/npm/errno/-/errno-0.1.8.tgz}
-    name: errno
-    version: 0.1.8
-    hasBin: true
-    requiresBuild: true
-    dependencies:
-      prr: 1.0.1
-    dev: true
-    optional: true
-
   mirrors.tencent.com/error-ex/1.3.2:
     resolution: {integrity: sha512-7dFHNmqeFSEt2ZBsCriorKnn3Z2pj+fd9kmI6QoWw4//DL+icEBfc0U7qJCisqrTsKTjw4fNFy2pW9OqStD84g==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://mirrors.tencent.com/npm/error-ex/-/error-ex-1.3.2.tgz}
     name: error-ex
@@ -4552,6 +4548,16 @@ packages:
     dependencies:
       postcss: mirrors.tencent.com/postcss/8.4.5
     dev: true
+
+  mirrors.tencent.com/image-size/0.5.5:
+    resolution: {integrity: sha1-Cd/Uq50g4p6xw+gLiZA3jfnjy5w=, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://mirrors.tencent.com/npm/image-size/-/image-size-0.5.5.tgz}
+    name: image-size
+    version: 0.5.5
+    engines: {node: '>=0.10.0'}
+    hasBin: true
+    requiresBuild: true
+    dev: true
+    optional: true
 
   mirrors.tencent.com/import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==, registry: http://mirrors.cloud.tencent.com/npm/, tarball: https://mirrors.tencent.com/npm/import-fresh/-/import-fresh-3.3.0.tgz}

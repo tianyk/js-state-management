@@ -31,10 +31,27 @@ async function getCurrentUser(): Promise<User> {
     }
 }
 
-interface TodoViewProps {
-    todo: Todo,
-    toggleTodo: (idx: number) => void
-}
+/************ todo View*****************/
+const todoConnector = connect<{ todo: Todo }, { toggleTodo: (id: number) => void }, { id: number }, RootState>(
+    (state, ownProps) => {
+        debug('TodoView.mapStateToProps: %j', state);
+        const todo = state.todos.find(todo => todo.id === ownProps.id);
+        return {
+            todo: { ...todo! }
+        }
+    },
+    /* mapDispatchToProps */
+    (dispatch) => {
+        debug('TodoView.mapDispatchToProps: %j', dispatch);
+        return {
+            toggleTodo: (id: number) => {
+                dispatch({ type: 'COMPLETE', id });
+            },
+        }
+    },
+);
+
+type TodoViewProps = ConnectedProps<typeof todoConnector>;
 
 function TodoView({ todo, toggleTodo }: TodoViewProps) {
     return <li style={{ 'height': '30px', 'lineHeight': '30px' }}>
@@ -45,51 +62,9 @@ function TodoView({ todo, toggleTodo }: TodoViewProps) {
     </li>
 }
 
-const todoListConnector = connect(
-    /* mapStateToProps */
-    (state: RootState) => {
-        debug('TodoListView.mapStateToProps: %j', state);
-        return {
-            todos: state.todos
-        }
-    },
-    /* mapDispatchToProps */
-    (dispatch) => {
-        debug('TodoListView.mapDispatchToProps: %j', dispatch);
-        return {
-            toggleTodo: (id: number) => {
-                dispatch({ type: 'COMPLETE', id })
-            },
-            addTodo: (text: string) => {
-                dispatch({ type: 'ADD_TODO', text })
-            }
-        }
-    },
-);
+const TodoViewContainer = todoConnector(TodoView);
 
-type TodoListViewProps = ConnectedProps<typeof todoListConnector>;
-
-function TodoListView({ todos, toggleTodo, addTodo }: TodoListViewProps) {
-    const [text, setText] = useState<string>('');
-
-    return <div>
-        <p>Redux TODO</p>
-
-        <div>
-            <input type="text" value={text} onChange={(evt) => setText(evt.target.value)} />
-            <button onClick={() => {
-                if (text) {
-                    addTodo(text);
-                    setText('');
-                }
-            }}>Add</button>
-        </div>
-
-        <ul>
-            {todos.map(todo => <TodoView key={todo.id} todo={todo} toggleTodo={toggleTodo} />)}
-        </ul>
-    </div>
-}
+/****************** user view ******************* */
 
 const userConnector = connect(
     (state: RootState) => {
@@ -122,6 +97,61 @@ function UserView({ user, getCurrentUser }: ConnectedProps<typeof userConnector>
 }
 
 const UserViewContainer = userConnector(UserView);
+
+/*****************todo list***************** */
+
+const todoListConnector = connect(
+    /* mapStateToProps */
+    (state: RootState) => {
+        debug('TodoListView.mapStateToProps: %j', state);
+        return {
+            todos: state.todos
+        }
+    },
+    /* mapDispatchToProps */
+    (dispatch) => {
+        debug('TodoListView.mapDispatchToProps: %j', dispatch);
+        return {
+            addTodo: (text: string) => {
+                dispatch({ type: 'ADD_TODO', text })
+            }
+        }
+    },
+);
+
+type TodoListViewProps = ConnectedProps<typeof todoListConnector>;
+
+function TodoListView({ todos, addTodo }: TodoListViewProps) {
+    const [text, setText] = useState<string>('');
+
+    function add() {
+        if (text) {
+            addTodo(text);
+            setText('');
+        }
+    }
+
+    return <div>
+        <p>Redux TODO</p>
+
+        <div>
+            <input type="text" value={text}
+                onChange={(evt) => setText(evt.target.value)}
+                onKeyDown={(evt) => {
+                    if (evt.key === 'Enter') {
+                        add();
+                    }
+                }}
+            />
+            <button onClick={add}>Add</button>
+        </div>
+
+        <ul>
+            {todos.map(todo => <TodoViewContainer key={todo.id} id={todo.id} />)}
+        </ul>
+    </div>
+}
+
 const TodoListViewContainer = todoListConnector(TodoListView);
 
 const store = createStore(combineReducers<RootState>({
@@ -138,7 +168,7 @@ const store = createStore(combineReducers<RootState>({
                 } else {
                     return todo;
                 }
-            })
+            });
         } else if (action.type === 'ADD_TODO') {
             return [
                 ...state,
