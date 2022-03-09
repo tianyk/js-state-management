@@ -9,6 +9,7 @@ interface Props {
 }
 
 function TodoListView({ todos, addTodo, toggleTodo }: Props) {
+    
     const [text, setText] = useState<string>('');
 
     function add() {
