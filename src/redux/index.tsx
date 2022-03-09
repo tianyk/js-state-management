@@ -1,14 +1,12 @@
 import Debug from 'debug';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
-import { connect, ConnectedProps, Provider } from 'react-redux';
-import type { AnyAction } from 'redux';
+import { connect, Provider } from 'react-redux';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
-import type { ThunkDispatch } from 'redux-thunk';
 import thunk from 'redux-thunk';
+import TodoListView from '../todo/todoList';
 
 const debug = Debug('redux');
-
 
 interface Todo {
     id: number,
@@ -25,81 +23,6 @@ interface RootState {
     user?: User
 }
 
-async function getCurrentUser(): Promise<User> {
-    return {
-        username: `u-${Date.now()}`
-    }
-}
-
-/************ todo View*****************/
-const todoConnector = connect<{ todo: Todo }, { toggleTodo: (id: number) => void }, { id: number }, RootState>(
-    (state, ownProps) => {
-        debug('TodoView.mapStateToProps: %j', state);
-        const todo = state.todos.find(todo => todo.id === ownProps.id);
-        return {
-            todo: { ...todo! }
-        }
-    },
-    /* mapDispatchToProps */
-    (dispatch) => {
-        debug('TodoView.mapDispatchToProps: %j', dispatch);
-        return {
-            toggleTodo: (id: number) => {
-                dispatch({ type: 'COMPLETE', id });
-            },
-        }
-    },
-);
-
-type TodoViewProps = ConnectedProps<typeof todoConnector>;
-
-function TodoView({ todo, toggleTodo }: TodoViewProps) {
-    return <li style={{ 'height': '30px', 'lineHeight': '30px' }}>
-        <span style={{ 'marginRight': '10px', textDecoration: todo.complete ? 'line-through' : 'none' }}>
-            {todo.text}
-        </span>
-        <button disabled={todo.complete} onClick={() => { toggleTodo(todo.id) }}>完成</button>
-    </li>
-}
-
-const TodoViewContainer = todoConnector(TodoView);
-
-/****************** user view ******************* */
-
-const userConnector = connect(
-    (state: RootState) => {
-        debug('UserView.mapStateToProps: %j', state);
-        return {
-            user: state.user
-        }
-    },
-    (dispatch: ThunkDispatch<RootState, {}, AnyAction>) => {
-        debug('UserView.mapDispatchToProps: %j', dispatch);
-        return {
-            getCurrentUser: () => {
-                // 异步 action，dispatch内部为一个函数
-                dispatch(async (dispatch, getState) => {
-                    const user = await getCurrentUser();
-                    dispatch({ type: 'USER_ME', user });
-                });
-            },
-            dispatch
-        }
-    }
-);
-
-function UserView({ user, getCurrentUser }: ConnectedProps<typeof userConnector>) {
-    useEffect(() => {
-        getCurrentUser();
-    }, []);
-
-    return <div>username: {user?.username}</div>
-}
-
-const UserViewContainer = userConnector(UserView);
-
-/*****************todo list***************** */
-
 const todoListConnector = connect(
     /* mapStateToProps */
     (state: RootState) => {
@@ -114,43 +37,14 @@ const todoListConnector = connect(
         return {
             addTodo: (text: string) => {
                 dispatch({ type: 'ADD_TODO', text })
-            }
+            },
+            toggleTodo: (id: number) => {
+                dispatch({ type: 'COMPLETE', id });
+            },
         }
     },
 );
 
-type TodoListViewProps = ConnectedProps<typeof todoListConnector>;
-
-function TodoListView({ todos, addTodo }: TodoListViewProps) {
-    const [text, setText] = useState<string>('');
-
-    function add() {
-        if (text) {
-            addTodo(text);
-            setText('');
-        }
-    }
-
-    return <div>
-        <p>Redux TODO</p>
-
-        <div>
-            <input type="text" value={text}
-                onChange={(evt) => setText(evt.target.value)}
-                onKeyDown={(evt) => {
-                    if (evt.key === 'Enter') {
-                        add();
-                    }
-                }}
-            />
-            <button onClick={add}>Add</button>
-        </div>
-
-        <ul>
-            {todos.map(todo => <TodoViewContainer key={todo.id} id={todo.id} />)}
-        </ul>
-    </div>
-}
 
 const TodoListViewContainer = todoListConnector(TodoListView);
 
@@ -202,7 +96,6 @@ store.subscribe(() => {
 
 function App() {
     return <Provider store={store}>
-        <UserViewContainer></UserViewContainer>
         <TodoListViewContainer></TodoListViewContainer>
     </Provider>
 }

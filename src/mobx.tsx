@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { autorun, trace, makeAutoObservable } from 'mobx';
+import { autorun, makeAutoObservable } from 'mobx';
 import { observer } from 'mobx-react';
 import Debug from 'debug';
 
