@@ -1,13 +1,15 @@
 import { MobXProviderContext } from 'mobx-react';
 import React from 'react';
-import TodoList from './todoList';
+import todoStore from './todoList';
 
 // https://mobx-react.js.org/recipes-migration
 
-export function useStores() {
-    return React.useContext(MobXProviderContext)
+const stores = {
+    todoStore
 }
 
-export default {
-    TodoList
-};
+export default stores;
+
+export function useStores() {
+    return React.useContext(MobXProviderContext) as typeof stores;
+}

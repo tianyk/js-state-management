@@ -1,43 +1,38 @@
+import { useObserver } from 'mobx-react';
 import React, { useState } from 'react';
-import { observer } from 'mobx-react';
-import type { Todo } from './todo';
+import { useStores } from '../store';
 import TodoView from './todo';
 
-interface Props {
-    todos: Todo[],
-    addTodo: (text: string) => void,
-    toggleTodo: (id: number) => void,
-}
-
-function TodoListView({ todos, addTodo, toggleTodo }: Props) {
-    const [text, setText] = useState<string>('');
+function TodoListView() {
+    const [text, setText] = useState('');
+    const { todoStore } = useStores();
 
     function add() {
-        if (text) {
-            addTodo(text);
-            setText('');
-        }
+        todoStore.addTodo(text);
+        setText('');
     }
 
-    return <div>
-        <p>Redux TODO</p>
+    return useObserver(() => {
+        return <div>
+            <p>Redux TODO</p>
 
-        <div>
-            <input type="text" value={text}
-                onChange={(evt) => setText(evt.target.value)}
-                onKeyDown={(evt) => {
-                    if (evt.key === 'Enter') {
-                        add();
-                    }
-                }}
-            />
-            <button onClick={add}>Add</button>
+            <div>
+                <input type="text" value={text}
+                    onChange={(evt) => setText(evt.target.value)}
+                    onKeyDown={(evt) => {
+                        if (evt.key === 'Enter') {
+                            add();
+                        }
+                    }}
+                />
+                <button onClick={add}>Add</button>
+            </div>
+
+            <ul>
+                {todoStore.todos.map(todo => <TodoView key={todo.id} todo={todo} />)}
+            </ul>
         </div>
-
-        <ul>
-            {todos.map(todo => <TodoView key={todo.id} todo={todo} toggleTodo={toggleTodo} />)}
-        </ul>
-    </div>
+    });
 }
 
-export default observer(TodoListView);
+export default TodoListView;
