@@ -1,4 +1,4 @@
-import { makeAutoObservable, action } from 'mobx';
+import { makeAutoObservable, action, trace } from 'mobx';
 import Debug from 'debug';
 
 const debug = Debug('mobx-react');
