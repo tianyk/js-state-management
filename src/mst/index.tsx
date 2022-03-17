@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { observer } from 'mobx-react';
-import TodoListView from '../todo/todoList';
+import TodoListView from './component/todoList';
 
 import { Provider, rootStore, useMst } from './model';
 

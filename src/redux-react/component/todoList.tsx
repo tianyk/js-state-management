@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Todo } from './todo';
 import TodoView from './todo';
 
-interface Props {
+export interface TodoListViewProps {
     todos: Todo[],
+    fetchTodoList: () => void,
     addTodo: (text: string) => void,
     toggleTodo: (id: number) => void,
 }
 
-function TodoListView({ todos, addTodo, toggleTodo }: Props) {
-    
+function TodoListView({ todos, addTodo, toggleTodo, fetchTodoList }: TodoListViewProps) {
     const [text, setText] = useState<string>('');
+
+    useEffect(() => {
+        fetchTodoList();
+    }, []);
 
     function add() {
         if (text) {

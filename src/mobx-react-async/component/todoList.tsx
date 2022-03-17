@@ -1,11 +1,20 @@
-import { useObserver } from 'mobx-react';
-import React, { useState } from 'react';
+import { observer } from 'mobx-react';
+import React, { useState, useEffect } from 'react';
 import { useStores } from '../store';
 import TodoView from './todo';
+import Debug from 'debug';
+
+const debug = Debug('mobx-react');
 
 function TodoListView() {
+    debug('TodoListView.observer [初始化会运行一次，做依赖检测]');
+
     const [text, setText] = useState('');
     const { todoStore } = useStores();
+
+    useEffect(() => {
+        todoStore.fetchTodoList();
+    }, [])
 
     function add() {
         if (text) {
@@ -14,7 +23,7 @@ function TodoListView() {
         }
     }
 
-    return useObserver(() => <div>
+    return <div>
         <p>Mobx React TODO</p>
 
         <div>
@@ -30,9 +39,9 @@ function TodoListView() {
         </div>
 
         <ul>
-            {todoStore.todos.map(todo => <TodoView key={todo.id} todo={todo} />)}
+            {todoStore.todos.map(todo => <TodoView key={todo.id} todo={todo} toggleTodo={todoStore.toggleTodo} removeTodo={todoStore.removeTodo} />)}
         </ul>
-    </div>);
+    </div>
 }
 
-export default TodoListView;
+export default observer(TodoListView);
